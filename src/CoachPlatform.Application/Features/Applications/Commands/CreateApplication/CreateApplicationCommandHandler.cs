@@ -32,8 +32,13 @@ public class CreateApplicationCommandHandler : IRequestHandler<CreateApplication
 
         // Check if email has already applied to this coach
         var email = Email.Create(request.Email);
-        var existingApplication = await _context.Applications
-            .AnyAsync(a => a.CoachId == request.CoachId && a.Email == email, cancellationToken);
+        var existingEmailsForCoach = await _context.Applications
+            .Where(a => a.CoachId == request.CoachId)
+            .Select(a => a.Email.Value)
+            .ToListAsync(cancellationToken);
+
+        var existingApplication = existingEmailsForCoach
+            .Any(value => string.Equals(value, email.Value, StringComparison.OrdinalIgnoreCase));
 
         if (existingApplication)
         {

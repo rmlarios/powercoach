@@ -1,0 +1,1 @@
+﻿INSERT INTO "Coaches" ("Id","FirstName","LastName","Email","Bio","Phone","IsActive","CreatedAt","UpdatedAt") VALUES ($$00000000-0000-0000-0000-000000000001$$,$$Demo$$,$$Coach$$,$$coach@powercoach.com$$,$$Platform demo coach$$,$$+1234567890$$,true,NOW(),NOW()) ON CONFLICT ("Id") DO NOTHING;

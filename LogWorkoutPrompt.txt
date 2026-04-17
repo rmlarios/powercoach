@@ -1,0 +1,296 @@
+Actúa como un Senior Fullstack Architect especializado en .NET, Clean Architecture, DDD, Next.js y aplicaciones SaaS de alto rendimiento.
+
+Actualmente existe una plataforma llamada CoachPlatform con:
+
+Backend en .NET (Clean Architecture, DDD)
+Frontend en Next.js
+Un Program Builder ya implementado (Weekly + Exercise Progression)
+
+Tu tarea es implementar el módulo más crítico del sistema:
+
+Workout Tracking System
+
+Este módulo conecta el Program Builder con la ejecución real del entrenamiento por parte del atleta.
+
+---
+
+OBJETIVO
+
+Permitir que un atleta:
+
+visualice su entrenamiento del día
+registre resultados reales (peso, reps, RPE)
+marque sets como completados
+
+Y que el sistema:
+
+guarde historial
+permita análisis futuro
+alimente el loop de coaching
+
+---
+
+BACKEND
+
+---
+
+1. ENTIDADES DE DOMINIO
+
+Crear:
+
+WorkoutSession
+WorkoutExercise
+WorkoutSet
+
+---
+
+WorkoutSession
+
+Id
+AthleteId
+ProgramId
+WeekNumber
+DayNumber
+Date
+Status (Pending, InProgress, Completed)
+
+---
+
+WorkoutExercise
+
+Id
+WorkoutSessionId
+ExerciseId
+Order
+
+---
+
+WorkoutSet
+
+Id
+WorkoutExerciseId
+
+PlannedReps
+PlannedWeight
+PlannedRPE
+
+ActualReps
+ActualWeight
+ActualRPE
+
+Completed (bool)
+
+---
+
+---
+
+2. RELACIÓN CON PROGRAM BUILDER
+
+El sistema debe generar automáticamente los WorkoutSessions a partir del Program.
+
+Cuando un atleta inicia un programa:
+
+crear sesiones por semana/día
+
+Cada sesión debe copiar:
+
+ejercicios
+sets
+reps
+RPE
+peso estimado
+
+---
+
+3. AGGREGATE ROOT
+
+WorkoutSession debe ser el Aggregate Root.
+
+Debe manejar:
+
+StartSession()
+CompleteSession()
+CompleteSet()
+UpdateSet()
+
+---
+
+4. REPOSITORIOS
+
+IWorkoutSessionRepository
+
+Métodos:
+
+GetByAthleteAndDate
+GetById
+Add
+Update
+
+---
+
+5. CASOS DE USO (APPLICATION)
+
+Crear:
+
+GetTodayWorkoutQuery
+StartWorkoutCommand
+CompleteSetCommand
+CompleteWorkoutCommand
+UpdateWorkoutSetCommand
+
+---
+
+6. API ENDPOINTS
+
+GET /api/workouts/today
+
+GET /api/workouts/{id}
+
+POST /api/workouts/{id}/start
+
+POST /api/workouts/{id}/complete
+
+POST /api/workouts/set/{setId}/update
+
+---
+
+7. DTOs
+
+WorkoutSessionDto
+WorkoutExerciseDto
+WorkoutSetDto
+
+---
+
+FRONTEND (NEXT.JS)
+
+---
+
+RUTA
+
+/athlete/workout
+
+---
+
+OBJETIVO
+
+Pantalla donde el atleta ejecuta su entrenamiento.
+
+---
+
+UI PRINCIPAL
+
+WorkoutPage
+
+Mostrar:
+
+Day title (ej: Day 1 - Bench Focus)
+
+Lista de ejercicios
+
+---
+
+POR CADA EJERCICIO
+
+ExerciseCard
+
+Nombre del ejercicio
+
+Lista de sets
+
+---
+
+POR CADA SET
+
+SetRow editable:
+
+Input Weight
+Input Reps
+Input RPE
+
+Checkbox Completed
+
+---
+
+UX IMPORTANTE
+
+Edición rápida tipo Excel
+
+Inputs inline
+
+Navegación con TAB
+
+---
+
+ESTADO
+
+Usar TanStack Query
+
+Optimistic updates
+
+---
+
+ACCIONES
+
+Al editar un set:
+
+llamar API update
+
+Al marcar set como completado:
+
+guardar automáticamente
+
+---
+
+EXPERIENCIA
+
+Debe sentirse:
+
+rápida
+fluida
+sin recargas
+
+---
+
+BONUS (SI ES POSIBLE)
+
+Mostrar:
+
+Previous performance
+
+Ejemplo:
+
+Last week: 100kg x5
+
+---
+
+INTEGRACIÓN
+
+El frontend debe consumir endpoints existentes.
+
+Si falta alguno:
+
+sugerir creación pero no duplicar lógica.
+
+---
+
+REGLAS IMPORTANTES
+
+No romper el Program Builder.
+
+Reutilizar entidades existentes.
+
+Seguir Clean Architecture.
+
+---
+
+RESULTADO ESPERADO
+
+Sistema completo donde:
+
+Coach crea programa
+Atleta ejecuta entrenamiento
+Sistema guarda resultados
+Se genera historial
+
+Esto debe cerrar el loop principal del producto.

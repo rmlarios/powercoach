@@ -114,3 +114,91 @@ public record CheckInSummaryDto
     public decimal? Weight { get; init; }
     public bool HasCoachFeedback { get; init; }
 }
+
+/// <summary>
+/// DTO for exercise history of an athlete.
+/// Contains historical performance data for a specific exercise.
+/// </summary>
+public record ExerciseHistoryDto
+{
+    public Guid AthleteId { get; init; }
+    public string AthleteName { get; init; } = null!;
+    public Guid ExerciseId { get; init; }
+    public string ExerciseName { get; init; } = null!;
+    
+    /// <summary>
+    /// Current 1RM for this exercise (most recent).
+    /// </summary>
+    public MaxLiftSummaryDto? Current1RM { get; init; }
+    
+    /// <summary>
+    /// Personal record (highest 1RM ever recorded).
+    /// </summary>
+    public MaxLiftSummaryDto? PersonalRecord { get; init; }
+    
+    /// <summary>
+    /// Last programmed prescription (from most recent program).
+    /// </summary>
+    public LastProgrammedDto? LastProgrammed { get; init; }
+    
+    /// <summary>
+    /// Weight trend over the last 3 months (positive = improvement).
+    /// </summary>
+    public decimal? TrendKg { get; init; }
+    
+    /// <summary>
+    /// Suggested starting percentage based on history.
+    /// </summary>
+    public int? SuggestedStartPercentage { get; init; }
+    
+    /// <summary>
+    /// Suggested starting weight based on 1RM.
+    /// </summary>
+    public decimal? SuggestedStartWeight { get; init; }
+    
+    /// <summary>
+    /// Recent performance logs (last 10).
+    /// </summary>
+    public IReadOnlyList<ExerciseLogSummaryDto> RecentLogs { get; init; } = [];
+    
+    /// <summary>
+    /// Whether the athlete has any history for this exercise.
+    /// </summary>
+    public bool HasHistory { get; init; }
+}
+
+/// <summary>
+/// Summary of a max lift record.
+/// </summary>
+public record MaxLiftSummaryDto
+{
+    public decimal Weight { get; init; }
+    public DateTime RecordedAt { get; init; }
+    public bool IsTested { get; init; }
+    public string? Source { get; init; }
+}
+
+/// <summary>
+/// Summary of last programmed exercise.
+/// </summary>
+public record LastProgrammedDto
+{
+    public string ProgramName { get; init; } = null!;
+    public int WeekNumber { get; init; }
+    public int DayNumber { get; init; }
+    public string Prescription { get; init; } = null!; // e.g., "3x5 @275kg"
+    public DateTime ProgramDate { get; init; }
+}
+
+/// <summary>
+/// Summary of an exercise performance log.
+/// </summary>
+public record ExerciseLogSummaryDto
+{
+    public DateTime PerformedAt { get; init; }
+    public int Sets { get; init; }
+    public int Reps { get; init; }
+    public decimal Weight { get; init; }
+    public decimal? Rpe { get; init; }
+    public string? Notes { get; init; }
+}

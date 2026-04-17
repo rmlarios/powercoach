@@ -1,8 +1,11 @@
 using CoachPlatform.Application.Features.Athletes.Commands.CreateAthlete;
 using CoachPlatform.Application.Features.Athletes.Commands.DeactivateAthlete;
+using CoachPlatform.Application.Features.Athletes.Commands.RegisterMaxLift;
 using CoachPlatform.Application.Features.Athletes.Commands.UpdateAthlete;
 using CoachPlatform.Application.Features.Athletes.Queries.GetAthleteById;
+using CoachPlatform.Application.Features.Athletes.Queries.GetAthleteMaxLifts;
 using CoachPlatform.Application.Features.Athletes.Queries.GetAthletesByCoach;
+using CoachPlatform.Application.Features.Athletes.Queries.GetExerciseHistory;
 using CoachPlatform.Application.Shared.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -152,4 +155,120 @@ public class AthletesController : ControllerBase
 
         return NoContent();
     }
+
+    // ==========================================
+    // Max Lifts (1RM) endpoints
+    // ==========================================
+
+    /// <summary>
+    /// Get all max lifts (1RM records) for an athlete.
+    /// </summary>
+    /// <param name="id">The athlete's unique identifier.</param>
+    /// <param name="exerciseId">Optional filter by exercise.</param>
+    /// <returns>The athlete's max lift records.</returns>
+    [HttpGet("{id:guid}/max-lifts")]
+    [ProducesResponseType(typeof(AthleteMaxLiftsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<AthleteMaxLiftsDto>> GetMaxLifts(
+        Guid id,
+        [FromQuery] Guid? exerciseId = null)
+    {
+        var query = new GetAthleteMaxLiftsQuery
+        {
+            AthleteId = id,
+            ExerciseId = exerciseId
+        };
+
+        var result = await _mediator.Send(query);
+
+        if (result is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Register a new max lift (1RM) for an athlete.
+    /// </summary>
+    /// <param name="id">The athlete's unique identifier.</param>
+    /// <param name="dto">The max lift data.</param>
+    /// <returns>The created max lift ID.</returns>
+    [HttpPost("{id:guid}/max-lifts")]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<Guid>> RegisterMaxLift(
+        Guid id,
+        [FromBody] RegisterMaxLiftDto dto)
+    {
+        var command = new RegisterMaxLiftCommand
+        {
+            AthleteId = id,
+            ExerciseId = dto.ExerciseId,
+            Weight = dto.Weight,
+            IsTested = dto.IsTested,
+            RecordedAt = dto.RecordedAt,
+            Notes = dto.Notes,
+            EstimationDetails = dto.EstimationDetails
+        };
+
+        var maxLiftId = await _mediator.Send(command);
+
+        _logger.LogInformation("Registered max lift {MaxLiftId} for athlete {AthleteId}",
+            maxLiftId, id);
+
+        return CreatedAtAction(
+            nameof(GetMaxLifts),
+            new { id },
+            maxLiftId);
+    }
+
+    // ==========================================
+    // Exercise History endpoints
+    // ==========================================
+
+    /// <summary>
+    /// Get exercise history for an athlete.
+    /// Returns historical performance data, 1RM records, and training suggestions.
+    /// </summary>
+    /// <param name="id">The athlete's unique identifier.</param>
+    /// <param name="exerciseId">The exercise's unique identifier.</param>
+    /// <returns>Exercise history with stats and suggestions.</returns>
+    [HttpGet("{id:guid}/exercise-history/{exerciseId:guid}")]
+    [ProducesResponseType(typeof(ExerciseHistoryDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ExerciseHistoryDto>> GetExerciseHistory(
+        Guid id,
+        Guid exerciseId)
+    {
+        var query = new GetExerciseHistoryQuery
+        {
+            AthleteId = id,
+            ExerciseId = exerciseId
+        };
+
+        var result = await _mediator.Send(query);
+
+        if (result is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(result);
+    }
+}
+
+/// <summary>
+/// DTO for registering a new max lift.
+/// </summary>
+public record RegisterMaxLiftDto
+{
+    public Guid ExerciseId { get; init; }
+    public decimal Weight { get; init; }
+    public bool IsTested { get; init; } = true;
+    public DateTime? RecordedAt { get; init; }
+    public string? Notes { get; init; }
+    public string? EstimationDetails { get; init; }
 }

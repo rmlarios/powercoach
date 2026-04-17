@@ -6,8 +6,10 @@
 
 ## 📐 Stack Tecnológico
 
+### Backend
+
 | Categoría | Tecnología | Versión |
-|-----------|------------|---------|
+|-----------|------------|--------|
 | **Runtime** | .NET | 9.0 |
 | **Framework** | ASP.NET Core Web API | 9.0 |
 | **ORM** | Entity Framework Core | 9.x |
@@ -16,12 +18,33 @@
 | **Contenedores** | Docker | - |
 | **Testing** | xUnit + FluentAssertions + Moq | - |
 
+### Frontend (coach-dashboard)
+
+| Categoría | Tecnología | Versión |
+|-----------|------------|--------|
+| **Framework** | Next.js (App Router) | 14.x |
+| **UI Library** | React | 18.x |
+| **Lenguaje** | TypeScript | 5.x |
+| **Estilos** | TailwindCSS | 3.4 |
+| **Componentes** | ShadCN UI | 0.8 (v3) |
+| **Data Fetching** | TanStack Query | 5.x |
+| **HTTP Client** | Axios | 1.x |
+
 ---
 
 ## 🏗️ Diagrama de Arquitectura
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
+│                              FRONTEND                                       │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                      coach-dashboard (Next.js 14)                     │  │
+│  │  Pages │ Components │ Hooks │ Providers │ API Client │ TanStack Query│  │
+│  │                    (React + TypeScript + TailwindCSS)                 │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                  ▼  REST API                                │
+├─────────────────────────────────────────────────────────────────────────────┤
 │                              PRESENTATION                                   │
 │  ┌───────────────────────────────────────────────────────────────────────┐  │
 │  │                     CoachPlatform.API                                 │  │
@@ -79,7 +102,14 @@ CoachPlatform/
 │   │   │   ├── CheckIn.cs
 │   │   │   ├── Exercise.cs
 │   │   │   ├── TrainingCycle.cs
-│   │   │   └── WorkoutLog.cs
+│   │   │   ├── WorkoutLog.cs
+│   │   │   ├── ProgramTemplate.cs          # Training Programs
+│   │   │   ├── ProgramWeekTemplate.cs
+│   │   │   ├── ProgramDayTemplate.cs
+│   │   │   ├── ProgramExerciseTemplate.cs
+│   │   │   ├── AthleteProgram.cs
+│   │   │   ├── AthleteWorkout.cs
+│   │   │   └── AthleteExerciseLog.cs
 │   │   ├── ValueObjects/
 │   │   │   ├── Email.cs
 │   │   │   ├── Money.cs
@@ -91,7 +121,9 @@ CoachPlatform/
 │   │   │   ├── SubscriptionStatus.cs
 │   │   │   ├── PlanType.cs
 │   │   │   ├── ExerciseCategory.cs
-│   │   │   └── MuscleGroup.cs
+│   │   │   ├── MuscleGroup.cs
+│   │   │   ├── ProgramStatus.cs            # Training Programs
+│   │   │   └── DayFocus.cs
 │   │   ├── DomainEvents/
 │   │   └── Interfaces/
 │   │       ├── IRepository.cs
@@ -113,7 +145,8 @@ CoachPlatform/
 │   │   │   │   ├── SubscriptionDtos.cs
 │   │   │   │   ├── PaymentDtos.cs
 │   │   │   │   ├── CheckInDtos.cs
-│   │   │   │   └── CoachDtos.cs
+│   │   │   │   ├── CoachDtos.cs
+│   │   │   │   └── TrainingProgramDtos.cs      # 15 DTOs para programas
 │   │   │   ├── Exceptions/
 │   │   │   │   ├── ValidationException.cs
 │   │   │   │   ├── NotFoundException.cs
@@ -125,19 +158,32 @@ CoachPlatform/
 │   │   │       ├── ITenantService.cs
 │   │   │       └── ITenantRequest.cs
 │   │   ├── Features/
-│   │   │   └── Athletes/
+│   │   │   ├── Athletes/
+│   │   │   │   ├── Commands/
+│   │   │   │   │   └── CreateAthlete/
+│   │   │   │   │       ├── CreateAthleteCommand.cs
+│   │   │   │   │       ├── CreateAthleteCommandHandler.cs
+│   │   │   │   │       └── CreateAthleteCommandValidator.cs
+│   │   │   │   └── Queries/
+│   │   │   │       ├── GetAthleteById/
+│   │   │   │       │   ├── GetAthleteByIdQuery.cs
+│   │   │   │       │   └── GetAthleteByIdQueryHandler.cs
+│   │   │   │       └── GetAthletesByCoach/
+│   │   │   │           ├── GetAthletesByCoachQuery.cs
+│   │   │   │           └── GetAthletesByCoachQueryHandler.cs
+│   │   │   └── TrainingPrograms/               # Nuevo módulo
 │   │   │       ├── Commands/
-│   │   │       │   └── CreateAthlete/
-│   │   │       │       ├── CreateAthleteCommand.cs
-│   │   │       │       ├── CreateAthleteCommandHandler.cs
-│   │   │       │       └── CreateAthleteCommandValidator.cs
+│   │   │       │   ├── CreateProgramTemplate/
+│   │   │       │   ├── AddProgramWeek/
+│   │   │       │   ├── AddProgramDay/
+│   │   │       │   ├── AddProgramExercise/
+│   │   │       │   ├── AssignProgramToAthlete/
+│   │   │       │   └── LogWorkout/
 │   │   │       └── Queries/
-│   │   │           ├── GetAthleteById/
-│   │   │           │   ├── GetAthleteByIdQuery.cs
-│   │   │           │   └── GetAthleteByIdQueryHandler.cs
-│   │   │           └── GetAthletesByCoach/
-│   │   │               ├── GetAthletesByCoachQuery.cs
-│   │   │               └── GetAthletesByCoachQueryHandler.cs
+│   │   │           ├── GetProgramTemplates/
+│   │   │           ├── GetProgramTemplateById/
+│   │   │           ├── GetAthleteProgram/
+│   │   │           └── GetAthleteWorkout/
 │   │   └── DependencyInjection.cs
 │   │
 │   ├── CoachPlatform.Infrastructure/
@@ -153,7 +199,14 @@ CoachPlatform/
 │   │   │   │   ├── CheckInConfiguration.cs
 │   │   │   │   ├── ExerciseConfiguration.cs
 │   │   │   │   ├── TrainingCycleConfiguration.cs
-│   │   │   │   └── WorkoutLogConfiguration.cs
+│   │   │   │   ├── WorkoutLogConfiguration.cs
+│   │   │   │   ├── ProgramTemplateConfiguration.cs      # Training Programs
+│   │   │   │   ├── ProgramWeekTemplateConfiguration.cs
+│   │   │   │   ├── ProgramDayTemplateConfiguration.cs
+│   │   │   │   ├── ProgramExerciseTemplateConfiguration.cs
+│   │   │   │   ├── AthleteProgramConfiguration.cs
+│   │   │   │   ├── AthleteWorkoutConfiguration.cs
+│   │   │   │   └── AthleteExerciseLogConfiguration.cs
 │   │   │   ├── Repositories/
 │   │   │   │   ├── BaseRepository.cs
 │   │   │   │   ├── CoachRepository.cs
@@ -172,7 +225,8 @@ CoachPlatform/
 │   │
 │   └── CoachPlatform.API/
 │       ├── Controllers/
-│       │   └── AthletesController.cs
+│       │   ├── AthletesController.cs
+│       │   └── TrainingProgramsController.cs   # 10 endpoints
 │       ├── Middleware/
 │       │   ├── ExceptionHandlingMiddleware.cs
 │       │   └── TenantMiddleware.cs
@@ -206,6 +260,102 @@ CoachPlatform/
 ├── .dockerignore
 ├── .gitignore
 └── README.md
+```
+
+### Estructura Frontend (coach-dashboard)
+
+```
+coach-dashboard/
+├── src/
+│   ├── app/
+│   │   ├── (dashboard)/
+│   │   │   ├── layout.tsx              # Layout con Sidebar + Topbar
+│   │   │   ├── dashboard/
+│   │   │   │   └── page.tsx
+│   │   │   ├── applications/
+│   │   │   │   └── page.tsx
+│   │   │   ├── athletes/
+│   │   │   │   └── page.tsx
+│   │   │   ├── programs/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [id]/
+│   │   │   │       └── builder/
+│   │   │   │           └── page.tsx    # Program Builder (Notion-like editor)
+│   │   │   ├── exercises/
+│   │   │   │   └── page.tsx
+│   │   │   └── settings/
+│   │   │       └── page.tsx
+│   │   ├── globals.css
+│   │   └── layout.tsx                  # Root layout
+│   │
+│   ├── components/
+│   │   ├── builder/                    # Program Builder components
+│   │   │   ├── index.ts
+│   │   │   ├── exercise-row.tsx        # Inline editing row
+│   │   │   ├── exercise-table.tsx      # Table with autocomplete
+│   │   │   ├── day-block.tsx           # Day container
+│   │   │   └── week-block.tsx          # Week container
+│   │   ├── common/
+│   │   │   ├── data-table.tsx
+│   │   │   ├── page-header.tsx
+│   │   │   ├── confirm-dialog.tsx
+│   │   │   ├── status-badge.tsx
+│   │   │   ├── stats-card.tsx
+│   │   │   ├── loading.tsx
+│   │   │   └── pagination.tsx
+│   │   ├── layout/
+│   │   │   ├── sidebar.tsx
+│   │   │   └── topbar.tsx
+│   │   └── ui/                         # ShadCN UI components
+│   │       ├── button.tsx
+│   │       ├── card.tsx
+│   │       ├── input.tsx
+│   │       ├── table.tsx
+│   │       ├── dialog.tsx
+│   │       ├── dropdown-menu.tsx
+│   │       └── ... (avatar, badge, etc.)
+│   │
+│   ├── hooks/
+│   │   ├── applications/               # Application hooks
+│   │   ├── athletes/                   # Athlete hooks
+│   │   ├── programs/                   # Program hooks
+│   │   └── exercises/                  # Exercise hooks
+│   │
+│   ├── lib/
+│   │   └── api/
+│   │       ├── client.ts               # Axios instance
+│   │       ├── endpoints.ts
+│   │       ├── applications-api.ts
+│   │       ├── athletes-api.ts
+│   │       ├── programs-api.ts
+│   │       ├── exercises-api.ts
+│   │       └── index.ts
+│   │
+│   ├── providers/
+│   │   ├── index.ts
+│   │   ├── query-provider.tsx          # TanStack Query
+│   │   ├── coach-provider.tsx          # Coach context
+│   │   └── builder-provider.tsx        # Program Builder state (useReducer)
+│   │
+│   ├── types/
+│   │   ├── index.ts
+│   │   ├── common.ts
+│   │   ├── application.ts
+│   │   ├── athlete.ts
+│   │   ├── exercise.ts
+│   │   ├── program.ts
+│   │   └── builder.ts                  # BuilderWeek, BuilderDay, BuilderExercise, BuilderAction
+│   │
+│   └── utils/
+│       ├── index.ts
+│       ├── cn.ts                       # clsx + tailwind-merge
+│       └── format-date.ts
+│
+├── public/
+├── package.json
+├── tailwind.config.ts
+├── tsconfig.json
+└── next.config.ts
 ```
 
 ---
@@ -399,6 +549,90 @@ Usar Fluent API en archivos de Configuration separados, no Data Annotations.
 
 ---
 
+### ADR-008: Training Programs con Templates
+
+**Estado**: ✅ Aceptada  
+**Fecha**: 2026-03-12
+
+**Contexto**:  
+Los coaches necesitan crear programas de entrenamiento reutilizables y asignarlos a atletas.
+
+**Decisión**:  
+Implementar un sistema de templates jerárquico:
+- `ProgramTemplate` → `ProgramWeekTemplate` → `ProgramDayTemplate` → `ProgramExerciseTemplate`
+- `AthleteProgram` como instancia de un template asignado a un atleta
+- `AthleteWorkout` y `AthleteExerciseLog` para tracking de progreso
+
+**Consecuencias**:
+- ✅ Templates reutilizables para múltiples atletas
+- ✅ Flexibilidad para customización por atleta
+- ✅ Tracking granular de progreso (sets, reps, pesos)
+- ⚠️ Estructura jerárquica compleja (4 niveles)
+- ⚠️ Requiere eager loading cuidadoso para evitar N+1
+
+---
+
+### ADR-009: Next.js 14 con App Router para Frontend
+
+**Estado**: ✅ Aceptada  
+**Fecha**: 2026-03-12
+
+**Contexto**:  
+Necesitamos un framework moderno para el dashboard del coach con buen DX y rendimiento.
+
+**Decisión**:  
+Usar Next.js 14 con:
+- App Router (RSC ready, layouts anidados)
+- TailwindCSS + ShadCN UI (componentes accesibles)
+- TanStack Query (server state management)
+- Axios (HTTP client con interceptors)
+
+**Consecuencias**:
+- ✅ Server Components para mejor rendimiento
+- ✅ Layouts compartidos y navegación optimizada
+- ✅ Componentes UI accesibles y consistentes
+- ✅ Caching y revalidación automática de datos
+- ⚠️ Curva de aprendizaje con App Router
+- ⚠️ Potenciales conflictos RSC vs Client Components
+
+---
+
+### ADR-010: Program Builder con useReducer + Context
+
+**Estado**: ✅ Aceptada  
+**Fecha**: 2026-03-13
+
+**Contexto**:  
+El Program Builder necesita manejar estado complejo y anidado (semanas → días → ejercicios) con múltiples acciones de usuario (editar, duplicar, reordenar, colapsar).
+
+**Decisión**:  
+Implementar el estado del builder usando:
+- `useReducer` para manejar 18+ acciones de estado predecibles
+- React Context (`BuilderProvider`) para compartir estado entre componentes
+- Tipos locales (`BuilderWeek`, `BuilderDay`, `BuilderExercise`) con flags de estado (`tempId`, `isNew`, `isDirty`, `isCollapsed`)
+- Sincronización explícita con API (no optimistic updates automáticos)
+
+**Arquitectura de Componentes**:
+```
+ProgramBuilderPage
+└── BuilderProvider (Context + Reducer)
+    ├── Header (Save status, Ctrl+S)
+    └── WeekBlock[]
+        └── DayBlock[]
+            └── ExerciseTable
+                └── ExerciseRow[] (inline editing, TAB navigation)
+```
+
+**Consecuencias**:
+- ✅ Estado predecible con acciones explícitas (debugging con React DevTools)
+- ✅ Componentes desacoplados vía Context
+- ✅ Control total sobre cuándo sincronizar con API
+- ✅ UX fluida sin latencia de red en cada keystroke
+- ⚠️ Más boilerplate que useState para casos simples
+- ⚠️ Requiere gestión manual de "unsaved changes"
+
+---
+
 ## 🗃️ Modelo de Datos
 
 ### Diagrama Entidad-Relación
@@ -457,10 +691,17 @@ Usar Fluent API en archivos de Configuration separados, no Data Annotations.
 | Coach → Athletes | 1:N | Un coach tiene muchos atletas |
 | Coach → Applications | 1:N | Un coach recibe muchas postulaciones |
 | Coach → Plans | 1:N | Un coach define múltiples planes |
+| Coach → ProgramTemplates | 1:N | Un coach crea múltiples plantillas de programas |
 | Athlete → Subscriptions | 1:N | Un atleta puede tener múltiples suscripciones (histórico) |
 | Athlete → CheckIns | 1:N | Un atleta registra múltiples check-ins |
+| Athlete → AthletePrograms | 1:N | Un atleta puede tener múltiples programas asignados |
 | Plan → Subscriptions | 1:N | Un plan puede tener múltiples suscripciones |
 | Subscription → Payments | 1:N | Una suscripción puede tener múltiples pagos |
+| ProgramTemplate → Weeks | 1:N | Un programa tiene múltiples semanas |
+| ProgramWeekTemplate → Days | 1:N | Una semana tiene múltiples días |
+| ProgramDayTemplate → Exercises | 1:N | Un día tiene múltiples ejercicios |
+| AthleteProgram → AthleteWorkouts | 1:N | Un programa asignado tiene múltiples workouts |
+| AthleteWorkout → AthleteExerciseLogs | 1:N | Un workout tiene múltiples logs de ejercicios |
 
 ---
 

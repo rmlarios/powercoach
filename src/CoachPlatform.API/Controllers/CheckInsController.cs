@@ -9,7 +9,7 @@ namespace CoachPlatform.API.Controllers;
 /// API endpoints for managing check-ins.
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/check-ins")]
 [Produces("application/json")]
 public class CheckInsController : ControllerBase
 {

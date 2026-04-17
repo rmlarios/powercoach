@@ -9,6 +9,7 @@ namespace CoachPlatform.Application.Shared.Interfaces;
 /// </summary>
 public interface IApplicationDbContext
 {
+    DbSet<User> Users { get; }
     DbSet<Coach> Coaches { get; }
     DbSet<Athlete> Athletes { get; }
     DbSet<Domain.Entities.Application> Applications { get; }
@@ -19,6 +20,16 @@ public interface IApplicationDbContext
     DbSet<TrainingCycle> TrainingCycles { get; }
     DbSet<WorkoutLog> WorkoutLogs { get; }
     DbSet<Exercise> Exercises { get; }
+    
+    // Training Programs module
+    DbSet<ProgramTemplate> ProgramTemplates { get; }
+    DbSet<ProgramWeekTemplate> ProgramWeekTemplates { get; }
+    DbSet<ProgramDayTemplate> ProgramDayTemplates { get; }
+    DbSet<ProgramExerciseTemplate> ProgramExerciseTemplates { get; }
+    DbSet<AthleteProgram> AthletePrograms { get; }
+    DbSet<AthleteWorkout> AthleteWorkouts { get; }
+    DbSet<AthleteExerciseLog> AthleteExerciseLogs { get; }
+    DbSet<AthleteMaxLift> AthleteMaxLifts { get; }
 
     /// <summary>
     /// Saves all changes made in this context to the database.

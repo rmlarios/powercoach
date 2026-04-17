@@ -47,15 +47,4 @@ public record UpdateCoachDto
     public string? ProfileImageUrl { get; init; }
 }
 
-/// <summary>
-/// DTO for coach dashboard summary.
-/// </summary>
-public record CoachDashboardDto
-{
-    public int ActiveAthletes { get; init; }
-    public int PendingApplications { get; init; }
-    public int PendingPayments { get; init; }
-    public int CheckInsPendingReview { get; init; }
-    public int ExpiringSubscriptions { get; init; }
-    public decimal TotalRevenueThisMonth { get; init; }
-}
+// CoachDashboardDto moved to DashboardDtos.cs

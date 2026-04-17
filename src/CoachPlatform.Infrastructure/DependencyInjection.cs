@@ -51,9 +51,13 @@ public static class DependencyInjection
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddScoped<ICheckInRepository, CheckInRepository>();
+        services.AddScoped<CoachPlatform.Application.Shared.Interfaces.IUserRepository, UserRepository>();
 
         // Register Unit of Work
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // Register JWT service
+        services.AddScoped<IJwtService, JwtService>();
 
         // Register User and Tenant services
         services.AddHttpContextAccessor();

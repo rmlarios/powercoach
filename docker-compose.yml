@@ -11,6 +11,10 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=coachplatform;Username=postgres;Password=postgres
+      - Cors__AllowedOrigins__0=http://localhost:3000
+      - Cors__AllowedOrigins__1=http://localhost:3001
+      - Cors__AllowedOrigins__2=http://localhost:3002
+      - Cors__AllowedOrigins__3=http://localhost:3003
     depends_on:
       postgres:
         condition: service_healthy
@@ -18,8 +22,24 @@ services:
       - coachplatform-network
     restart: unless-stopped
 
+  frontend:
+    build:
+      context: ./coach-dashboard
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://localhost:5000/api
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - api
+    networks:
+      - coachplatform-network
+    restart: unless-stopped
+
   postgres:
-    image: postgres:16-alpine
+    image: postgres:16
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres

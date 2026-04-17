@@ -43,9 +43,13 @@ public class ApproveApplicationCommandHandler : IRequestHandler<ApproveApplicati
         }
 
         // Check if an athlete with this email already exists for this coach
-        var emailExists = await _context.Athletes
-            .AnyAsync(a => a.CoachId == application.CoachId && 
-                          a.Email == application.Email, cancellationToken);
+        var existingAthleteEmailsForCoach = await _context.Athletes
+            .Where(a => a.CoachId == application.CoachId)
+            .Select(a => a.Email.Value)
+            .ToListAsync(cancellationToken);
+
+        var emailExists = existingAthleteEmailsForCoach
+            .Any(value => string.Equals(value, application.Email.Value, StringComparison.OrdinalIgnoreCase));
 
         if (emailExists)
         {

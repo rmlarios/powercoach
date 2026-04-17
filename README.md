@@ -12,7 +12,10 @@ Sistema backend para gestión de atletas, pagos y postulaciones de coach de powe
 | API Layer | ✅ Completado |
 | Multi-tenancy | ✅ Completado |
 | Exercise Library | ✅ Completado |
-| Unit Tests | ✅ 147 tests pasando |
+| Training Programs | ✅ Completado |
+| Frontend Dashboard | ✅ Completado |
+| Program Builder | ✅ Completado |
+| Unit Tests | ✅ 147+ tests pasando |
 | Docker Support | ✅ Completado |
 
 ## 🏗️ Arquitectura
@@ -22,7 +25,16 @@ Sistema backend para gestión de atletas, pagos y postulaciones de coach de powe
 - **CQRS ligero** con MediatR para separación de commands/queries
 - **Repository Pattern** para abstracción de persistencia
 
+### Frontend (coach-dashboard)
+
+- **Next.js 14** con App Router
+- **TailwindCSS + ShadCN UI** para componentes accesibles
+- **TanStack Query** para server state management
+- **Program Builder** - Editor avanzado tipo Notion con inline editing
+
 ## 🛠️ Stack Tecnológico
+
+### Backend
 
 | Tecnología | Versión |
 |------------|---------|
@@ -34,6 +46,17 @@ Sistema backend para gestión de atletas, pagos y postulaciones de coach de powe
 | FluentValidation | 12.x |
 | Docker | Latest |
 
+### Frontend
+
+| Tecnología | Versión |
+|------------|---------||
+| Next.js | 14.x |
+| React | 18.x |
+| TypeScript | 5.x |
+| TailwindCSS | 3.4 |
+| ShadCN UI | Latest |
+| TanStack Query | 5.x |
+
 ## 📁 Estructura del Proyecto
 
 ```
@@ -43,6 +66,13 @@ CoachPlatform/
 │   ├── CoachPlatform.Application    # Commands, Queries, DTOs, Validators
 │   ├── CoachPlatform.Infrastructure # EF Core, Repositories, Configs
 │   └── CoachPlatform.API            # Controllers, Middleware, Swagger
+├── coach-dashboard/                  # Frontend Next.js
+│   ├── src/
+│   │   ├── app/(dashboard)/         # Pages (dashboard, athletes, programs, etc.)
+│   │   ├── components/builder/      # Program Builder components
+│   │   ├── providers/               # React Context providers
+│   │   ├── types/                   # TypeScript interfaces
+│   │   └── lib/api/                 # API client
 ├── tests/
 │   ├── CoachPlatform.UnitTests
 │   └── CoachPlatform.IntegrationTests
@@ -143,9 +173,9 @@ Ver [BACKLOG.md](docs/BACKLOG.md) para el estado actual del desarrollo.
 
 | Métrica | Valor |
 |---------|-------|
-| Features | 7 |
-| Tasks | 68 |
-| Sprint Actual | 1 |
+| Features | 12 |
+| Tasks | 118 |
+| Completadas | 100% |
 
 ## 📝 Licencia
 

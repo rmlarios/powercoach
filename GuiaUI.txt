@@ -1,0 +1,18 @@
+1. Filosofía de Entrada de Datos (The "Paper" Feel)
+Modo "Inline Edit": No uses modales para editar series o repeticiones. Al tocar un número, este debe convertirse en un input in-place con el teclado numérico ya activo.
+Smart Parser: El componente de entrada debe aceptar lenguaje natural simple (ej: "100x8" o "100 8") y autocompletar la celda sin necesidad de saltar entre campos de "Peso" y "Reps".
+Persistencia Silenciosa: Implementa un sistema de guardado automático (autosave) para que el atleta nunca tenga que buscar un botón de "Guardar". La sensación debe ser la de escribir en una hoja.
+2. Arquitectura de Componentes (React + Tailwind)
+Layout de Lista Infinita: Usa una estructura de lista vertical limpia (como un cuaderno de notas) donde cada ejercicio sea un bloque visualmente separado por espacios en blanco, no por bordes pesados.
+Micro-Interacciones de Éxito: Al marcar una serie como completada, aplica una transición de opacidad suave o un tachado elegante (strikethrough) con una animación de 200ms.
+Estados de Carga Invisibles: Usa skeletons finos o transiciones de opacidad para que la app se sienta instantánea, incluso si está procesando datos en segundo plano.
+3. Estética Visual (Design System)
+Tipografía Monoespaciada para Datos: Usa fuentes tipo JetBrains Mono o Roboto Mono para los números de peso y repeticiones. Esto evoca precisión técnica y legibilidad rápida bajo fatiga.
+Paleta de Color "Papel Digital":
+Fondo: Un gris casi blanco o un "Hueso" muy sutil (bg-slate-50).
+Contraste: Texto en negro puro o azul medianoche para máxima legibilidad.
+Acento: Un solo color vibrante (ej. naranja neón o verde eléctrico) exclusivamente para acciones críticas o récords personales (PRs).
+4. Usabilidad en Fatiga (Gestos y Feedback)
+Zonas de Toque Ampliadas: Asegura que todos los elementos interactivos tengan un área de toque de al menos 44x44px, aunque visualmente parezcan más pequeños.
+Haptic Feedback (Instrucción de Lógica): Indica al agente que, en dispositivos móviles, cada "Check" de serie debe disparar una vibración corta (vibrate(10)).
+Orden Inteligente: El foco del cursor debe saltar automáticamente a la siguiente serie tras completar la anterior (flujo "Top-to-Bottom").

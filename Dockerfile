@@ -33,9 +33,9 @@ USER appuser
 
 COPY --from=publish /app/publish .
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl --fail http://localhost:8080/health || exit 1
+# Health check using bash built-in /dev/tcp (no curl/wget needed)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+    CMD bash -c "exec 3<>/dev/tcp/127.0.0.1/8080; printf 'GET /health HTTP/1.0\r\nHost: localhost\r\n\r\n' >&3; grep -q Healthy <&3" || exit 1
 
 EXPOSE 8080
 
