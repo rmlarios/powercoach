@@ -1,5 +1,9 @@
 using CoachPlatform.Application.Features.CheckIns.Commands.CreateCheckIn;
+using CoachPlatform.Application.Features.CheckIns.Commands.ReviewCheckIn;
 using CoachPlatform.Application.Features.CheckIns.Queries.GetAthleteCheckIns;
+using CoachPlatform.Application.Features.CheckIns.Queries.GetCheckInById;
+using CoachPlatform.Application.Features.CheckIns.Queries.GetCoachCheckIns;
+using CoachPlatform.Application.Shared.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,12 +29,8 @@ public class CheckInsController : ControllerBase
     /// <summary>
     /// Create a new check-in for an athlete.
     /// </summary>
-    /// <param name="request">The check-in data.</param>
-    /// <returns>The created check-in ID.</returns>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Create([FromBody] CreateCheckInRequest request)
     {
         var command = new CreateCheckInCommand
@@ -44,11 +44,69 @@ public class CheckInsController : ControllerBase
         };
 
         var checkInId = await _mediator.Send(command);
-        _logger.LogInformation("CheckIn {CheckInId} created for athlete {AthleteId}", checkInId, request.AthleteId);
-        
         return CreatedAtAction(nameof(Create), new { id = checkInId }, new { Id = checkInId });
     }
+
+    /// <summary>
+    /// Get all check-ins for a coach's athletes.
+    /// </summary>
+    [HttpGet("coach")]
+    [ProducesResponseType(typeof(PagedResult<CheckInDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCoachCheckIns([FromQuery] Guid coachId, [FromQuery] bool? isReviewed, [FromQuery] int page = 1, [FromQuery] int size = 10)
+    {
+        var query = new GetCoachCheckInsQuery
+        {
+            CoachId = coachId,
+            IsReviewed = isReviewed,
+            PageNumber = page,
+            PageSize = size
+        };
+
+        var result = await _mediator.Send(query);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Get a check-in by id.
+    /// </summary>
+    [HttpGet("{id}")]
+    [ProducesResponseType(typeof(CheckInDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetById(Guid id, [FromQuery] Guid coachId)
+    {
+        var query = new GetCheckInByIdQuery
+        {
+            CheckInId = id,
+            CoachId = coachId
+        };
+        var result = await _mediator.Send(query);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Review and add feedback to a check-in.
+    /// </summary>
+    [HttpPut("{id}/review")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ReviewCheckIn(Guid id, [FromBody] ReviewCheckInRequest request)
+    {
+        var command = new ReviewCheckInCommand
+        {
+            CheckInId = id,
+            CoachId = request.CoachId,
+            Feedback = request.Feedback
+        };
+
+        await _mediator.Send(command);
+        return NoContent();
+    }
 }
+
+/// <summary>
+/// Request model for reviewing a check-in.
+/// </summary>
+public record ReviewCheckInRequest(
+    Guid CoachId,
+    string Feedback);
 
 /// <summary>
 /// Controller for athlete-specific check-in operations.

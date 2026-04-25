@@ -31,9 +31,9 @@ public class CreateAthleteCommandHandler : IRequestHandler<CreateAthleteCommand,
         }
 
         // Check if email is already in use by another athlete
-        var email = Email.Create(request.Email);
+        var normalizedEmail = request.Email.ToLowerInvariant().Trim();
         var emailExists = await _context.Athletes
-            .AnyAsync(a => a.Email == email, cancellationToken);
+            .AnyAsync(a => a.Email.Value == normalizedEmail, cancellationToken);
 
         if (emailExists)
         {

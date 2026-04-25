@@ -20,27 +20,18 @@ public class CreateExerciseCommandHandler : IRequestHandler<CreateExerciseComman
 
     public async Task<Guid> Handle(CreateExerciseCommand request, CancellationToken cancellationToken)
     {
-        // Verify coach exists
-        var coachExists = await _context.Coaches
-            .AnyAsync(c => c.Id == request.CoachId, cancellationToken);
-
-        if (!coachExists)
-        {
-            throw new NotFoundException(nameof(Coach), request.CoachId);
-        }
-
-        // Check for duplicate exercise name for this coach
+        // Check for duplicate exercise name globally
         var duplicateExists = await _context.Exercises
-            .AnyAsync(e => e.CoachId == request.CoachId && e.Name == request.Name, cancellationToken);
+            .AnyAsync(e => e.Name == request.Name, cancellationToken);
 
         if (duplicateExists)
         {
             throw new ConflictException($"An exercise with name '{request.Name}' already exists.");
         }
 
-        // Create the exercise
+        // Create the exercise (no coach ownership)
         var exercise = Exercise.Create(
-            request.CoachId,
+            null,
             request.Name,
             request.Category,
             request.PrimaryMuscleGroup,

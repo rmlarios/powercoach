@@ -10,10 +10,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace CoachPlatform.API.Controllers;
 
 /// <summary>
-/// API endpoints for managing exercises in the coach's library.
+/// API endpoints for managing the global exercise catalog.
 /// </summary>
 [ApiController]
-[Route("api/coaches/{coachId:guid}/exercises")]
+[Route("api/[controller]")]
 [Produces("application/json")]
 public class ExercisesController : ControllerBase
 {
@@ -27,24 +27,17 @@ public class ExercisesController : ControllerBase
     }
 
     /// <summary>
-    /// Get all exercises for a coach.
+    /// Get all exercises from the global catalog.
     /// </summary>
-    /// <param name="coachId">The coach's unique identifier.</param>
-    /// <param name="category">Optional filter by category.</param>
-    /// <param name="muscleGroup">Optional filter by muscle group.</param>
-    /// <param name="isActive">Optional filter by active status.</param>
-    /// <returns>List of exercises.</returns>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetByCoach(
-        Guid coachId,
+    public async Task<IActionResult> GetAll(
         [FromQuery] ExerciseCategory? category = null,
         [FromQuery] MuscleGroup? muscleGroup = null,
         [FromQuery] bool? isActive = null)
     {
         var query = new GetExercisesByCoachQuery
         {
-            CoachId = coachId,
             Category = category,
             MuscleGroup = muscleGroup,
             IsActive = isActive
@@ -57,24 +50,15 @@ public class ExercisesController : ControllerBase
     /// <summary>
     /// Get a specific exercise by ID.
     /// </summary>
-    /// <param name="coachId">The coach's unique identifier.</param>
-    /// <param name="exerciseId">The exercise's unique identifier.</param>
-    /// <returns>The exercise details.</returns>
     [HttpGet("{exerciseId:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetById(Guid coachId, Guid exerciseId)
+    public async Task<IActionResult> GetById(Guid exerciseId)
     {
         var query = new GetExerciseByIdQuery { ExerciseId = exerciseId };
         var exercise = await _mediator.Send(query);
 
         if (exercise is null)
-        {
-            return NotFound();
-        }
-
-        // Verify the exercise belongs to the coach
-        if (exercise.CoachId != coachId)
         {
             return NotFound();
         }
@@ -85,18 +69,14 @@ public class ExercisesController : ControllerBase
     /// <summary>
     /// Create a new exercise.
     /// </summary>
-    /// <param name="coachId">The coach's unique identifier.</param>
-    /// <param name="request">The exercise data.</param>
-    /// <returns>The created exercise ID.</returns>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> Create(Guid coachId, [FromBody] CreateExerciseRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateExerciseRequest request)
     {
         var command = new CreateExerciseCommand
         {
-            CoachId = coachId,
             Name = request.Name,
             Description = request.Description,
             Category = request.Category,
@@ -108,9 +88,9 @@ public class ExercisesController : ControllerBase
         };
 
         var exerciseId = await _mediator.Send(command);
-        _logger.LogInformation("Exercise {ExerciseId} created for coach {CoachId}", exerciseId, coachId);
+        _logger.LogInformation("Exercise {ExerciseId} created", exerciseId);
 
-        return CreatedAtAction(nameof(GetById), new { coachId, exerciseId }, new { Id = exerciseId });
+        return CreatedAtAction(nameof(GetById), new { exerciseId }, new { Id = exerciseId });
     }
 
     /// <summary>
@@ -121,11 +101,10 @@ public class ExercisesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> Update(Guid coachId, Guid exerciseId, [FromBody] UpdateExerciseRequest request)
+    public async Task<IActionResult> Update(Guid exerciseId, [FromBody] UpdateExerciseRequest request)
     {
         var command = new UpdateExerciseCommand
         {
-            CoachId = coachId,
             ExerciseId = exerciseId,
             Name = request.Name,
             Description = request.Description,
@@ -138,7 +117,7 @@ public class ExercisesController : ControllerBase
         };
 
         await _mediator.Send(command);
-        _logger.LogInformation("Exercise {ExerciseId} updated for coach {CoachId}", exerciseId, coachId);
+        _logger.LogInformation("Exercise {ExerciseId} updated", exerciseId);
 
         return NoContent();
     }
@@ -149,16 +128,15 @@ public class ExercisesController : ControllerBase
     [HttpDelete("{exerciseId:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(Guid coachId, Guid exerciseId)
+    public async Task<IActionResult> Delete(Guid exerciseId)
     {
         var command = new DeleteExerciseCommand
         {
-            CoachId = coachId,
             ExerciseId = exerciseId,
         };
 
         await _mediator.Send(command);
-        _logger.LogInformation("Exercise {ExerciseId} deactivated for coach {CoachId}", exerciseId, coachId);
+        _logger.LogInformation("Exercise {ExerciseId} deactivated", exerciseId);
 
         return NoContent();
     }

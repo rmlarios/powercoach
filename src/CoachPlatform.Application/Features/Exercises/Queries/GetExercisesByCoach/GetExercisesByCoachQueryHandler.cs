@@ -21,7 +21,7 @@ public class GetExercisesByCoachQueryHandler : IRequestHandler<GetExercisesByCoa
     {
         var query = _context.Exercises
             .AsNoTracking()
-            .Where(e => e.CoachId == request.CoachId);
+            .AsQueryable();
 
         // Apply filters
         if (request.Category.HasValue)

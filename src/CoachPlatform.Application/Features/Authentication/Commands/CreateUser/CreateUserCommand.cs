@@ -72,17 +72,28 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, UserD
 
     private async Task<User> CreateCoachUserAsync(CreateUserCommand request, string passwordHash, CancellationToken cancellationToken)
     {
-        if (!request.CoachId.HasValue)
-            throw new AppValidationException(new[]
-            {
-                new FluentValidation.Results.ValidationFailure("CoachId", "CoachId is required for Coach role.")
-            });
+        Guid coachId;
 
-        var coachExists = await _context.Coaches.AnyAsync(c => c.Id == request.CoachId.Value, cancellationToken);
-        if (!coachExists)
-            throw new NotFoundException("Coach", request.CoachId.ToString()!);
+        if (request.CoachId.HasValue)
+        {
+            // Link to existing Coach entity
+            var coachExists = await _context.Coaches.AnyAsync(c => c.Id == request.CoachId.Value, cancellationToken);
+            if (!coachExists)
+                throw new NotFoundException("Coach", request.CoachId.ToString()!);
+            coachId = request.CoachId.Value;
+        }
+        else
+        {
+            // Auto-create a new Coach entity from user's email and username
+            var nameParts = request.Username.Split(' ', 2);
+            var firstName = nameParts[0];
+            var lastName = nameParts.Length > 1 ? nameParts[1] : request.Username;
+            var coach = Coach.Create(firstName, lastName, request.Email);
+            _context.Coaches.Add(coach);
+            coachId = coach.Id;
+        }
 
-        return User.CreateCoach(request.CoachId.Value, request.Email, request.Username, passwordHash);
+        return User.CreateCoach(coachId, request.Email, request.Username, passwordHash);
     }
 
     private async Task<User> CreateAthleteUserAsync(CreateUserCommand request, string passwordHash, CancellationToken cancellationToken)

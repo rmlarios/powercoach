@@ -1,4 +1,3 @@
-using CoachPlatform.Application.Shared.Interfaces;
 using CoachPlatform.Domain.Enums;
 using MediatR;
 
@@ -7,9 +6,8 @@ namespace CoachPlatform.Application.Features.Exercises.Commands.UpdateExercise;
 /// <summary>
 /// Command to update an existing exercise.
 /// </summary>
-public record UpdateExerciseCommand : IRequest, ITenantRequest
+public record UpdateExerciseCommand : IRequest
 {
-    public Guid CoachId { get; init; }
     public Guid ExerciseId { get; init; }
     public string Name { get; init; } = null!;
     public string? Description { get; init; }

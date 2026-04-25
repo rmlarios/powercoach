@@ -21,7 +21,7 @@ public class UpdateExerciseCommandHandler : IRequestHandler<UpdateExerciseComman
     public async Task Handle(UpdateExerciseCommand request, CancellationToken cancellationToken)
     {
         var exercise = await _context.Exercises
-            .FirstOrDefaultAsync(e => e.Id == request.ExerciseId && e.CoachId == request.CoachId, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == request.ExerciseId, cancellationToken);
 
         if (exercise is null)
         {
@@ -30,8 +30,7 @@ public class UpdateExerciseCommandHandler : IRequestHandler<UpdateExerciseComman
 
         // Check for duplicate name (excluding the current exercise)
         var duplicateExists = await _context.Exercises
-            .AnyAsync(e => e.CoachId == request.CoachId
-                        && e.Name == request.Name
+            .AnyAsync(e => e.Name == request.Name
                         && e.Id != request.ExerciseId, cancellationToken);
 
         if (duplicateExists)

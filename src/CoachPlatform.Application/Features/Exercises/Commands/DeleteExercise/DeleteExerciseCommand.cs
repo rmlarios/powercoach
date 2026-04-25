@@ -1,4 +1,3 @@
-using CoachPlatform.Application.Shared.Interfaces;
 using MediatR;
 
 namespace CoachPlatform.Application.Features.Exercises.Commands.DeleteExercise;
@@ -6,8 +5,7 @@ namespace CoachPlatform.Application.Features.Exercises.Commands.DeleteExercise;
 /// <summary>
 /// Command to soft-delete (deactivate) an exercise.
 /// </summary>
-public record DeleteExerciseCommand : IRequest, ITenantRequest
+public record DeleteExerciseCommand : IRequest
 {
-    public Guid CoachId { get; init; }
     public Guid ExerciseId { get; init; }
 }

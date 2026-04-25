@@ -6,7 +6,6 @@ public class UpdateExerciseCommandValidator : AbstractValidator<UpdateExerciseCo
 {
     public UpdateExerciseCommandValidator()
     {
-        RuleFor(x => x.CoachId).NotEmpty();
         RuleFor(x => x.ExerciseId).NotEmpty();
         RuleFor(x => x.Name).NotEmpty().MaximumLength(200);
         RuleFor(x => x.Description).MaximumLength(2000);

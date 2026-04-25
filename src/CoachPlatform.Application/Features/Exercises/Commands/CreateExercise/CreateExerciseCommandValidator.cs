@@ -9,9 +9,6 @@ public class CreateExerciseCommandValidator : AbstractValidator<CreateExerciseCo
 {
     public CreateExerciseCommandValidator()
     {
-        RuleFor(x => x.CoachId)
-            .NotEmpty().WithMessage("Coach ID is required.");
-
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Exercise name is required.")
             .MaximumLength(200).WithMessage("Exercise name must not exceed 200 characters.");

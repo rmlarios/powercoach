@@ -1,6 +1,7 @@
 using CoachPlatform.Application.Features.Dashboard.Queries.GetCoachDashboard;
 using CoachPlatform.Application.Shared.DTOs;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoachPlatform.API.Controllers;
@@ -8,6 +9,7 @@ namespace CoachPlatform.API.Controllers;
 /// <summary>
 /// API endpoints for the coach dashboard.
 /// </summary>
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]

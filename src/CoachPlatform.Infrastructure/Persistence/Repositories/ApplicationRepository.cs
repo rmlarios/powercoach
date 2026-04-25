@@ -54,9 +54,9 @@ public class ApplicationRepository : BaseRepository<Domain.Entities.Application>
         string email,
         CancellationToken cancellationToken = default)
     {
-        var emailVo = Email.Create(email);
+        var normalizedEmail = email.ToLowerInvariant().Trim();
         return await DbSet
-            .FirstOrDefaultAsync(a => a.CoachId == coachId && a.Email == emailVo, cancellationToken);
+            .FirstOrDefaultAsync(a => a.CoachId == coachId && a.Email.Value == normalizedEmail, cancellationToken);
     }
 
     public async Task<bool> EmailExistsAsync(
@@ -64,9 +64,9 @@ public class ApplicationRepository : BaseRepository<Domain.Entities.Application>
         string email,
         CancellationToken cancellationToken = default)
     {
-        var emailVo = Email.Create(email);
+        var normalizedEmail = email.ToLowerInvariant().Trim();
         return await DbSet.AnyAsync(
-            a => a.CoachId == coachId && a.Email == emailVo,
+            a => a.CoachId == coachId && a.Email.Value == normalizedEmail,
             cancellationToken);
     }
 

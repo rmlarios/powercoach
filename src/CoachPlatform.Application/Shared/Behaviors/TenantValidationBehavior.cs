@@ -16,15 +16,18 @@ public class TenantValidationBehavior<TRequest, TResponse> : IPipelineBehavior<T
 {
     private readonly ITenantService _tenantService;
     private readonly IApplicationDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
     private readonly ILogger<TenantValidationBehavior<TRequest, TResponse>> _logger;
 
     public TenantValidationBehavior(
         ITenantService tenantService,
         IApplicationDbContext context,
+        ICurrentUserService currentUserService,
         ILogger<TenantValidationBehavior<TRequest, TResponse>> logger)
     {
         _tenantService = tenantService;
         _context = context;
+        _currentUserService = currentUserService;
         _logger = logger;
     }
 
@@ -50,6 +53,12 @@ public class TenantValidationBehavior<TRequest, TResponse> : IPipelineBehavior<T
 
     private Task ValidateTenantAccess(ITenantRequest request, CancellationToken cancellationToken)
     {
+        // Admins can access resources across all tenants
+        if (_currentUserService.IsInRole("Admin"))
+        {
+            return Task.CompletedTask;
+        }
+
         if (!_tenantService.HasTenant)
         {
             _logger.LogWarning("Tenant validation failed: No tenant context set for request {RequestType}", 
@@ -70,6 +79,12 @@ public class TenantValidationBehavior<TRequest, TResponse> : IPipelineBehavior<T
 
     private async Task ValidateAthleteAccess(IAthleteOwnedRequest request, CancellationToken cancellationToken)
     {
+        // Admins can access resources across all tenants
+        if (_currentUserService.IsInRole("Admin"))
+        {
+            return;
+        }
+
         if (!_tenantService.HasTenant)
         {
             _logger.LogWarning("Tenant validation failed: No tenant context set for athlete request {RequestType}", 

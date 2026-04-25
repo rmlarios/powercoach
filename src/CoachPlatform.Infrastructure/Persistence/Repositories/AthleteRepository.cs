@@ -47,9 +47,9 @@ public class AthleteRepository : BaseRepository<Athlete>, IAthleteRepository
         string email,
         CancellationToken cancellationToken = default)
     {
-        var emailVo = Email.Create(email);
+        var normalizedEmail = email.ToLowerInvariant().Trim();
         return await DbSet
-            .FirstOrDefaultAsync(a => a.CoachId == coachId && a.Email == emailVo, cancellationToken);
+            .FirstOrDefaultAsync(a => a.CoachId == coachId && a.Email.Value == normalizedEmail, cancellationToken);
     }
 
     public async Task<Athlete?> GetWithDetailsAsync(
@@ -68,9 +68,9 @@ public class AthleteRepository : BaseRepository<Athlete>, IAthleteRepository
         string email,
         CancellationToken cancellationToken = default)
     {
-        var emailVo = Email.Create(email);
+        var normalizedEmail = email.ToLowerInvariant().Trim();
         return await DbSet.AnyAsync(
-            a => a.CoachId == coachId && a.Email == emailVo,
+            a => a.CoachId == coachId && a.Email.Value == normalizedEmail,
             cancellationToken);
     }
 

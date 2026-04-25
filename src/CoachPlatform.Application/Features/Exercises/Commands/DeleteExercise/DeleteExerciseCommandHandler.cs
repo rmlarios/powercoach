@@ -23,7 +23,7 @@ public class DeleteExerciseCommandHandler : IRequestHandler<DeleteExerciseComman
     public async Task Handle(DeleteExerciseCommand request, CancellationToken cancellationToken)
     {
         var exercise = await _context.Exercises
-            .FirstOrDefaultAsync(e => e.Id == request.ExerciseId && e.CoachId == request.CoachId, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == request.ExerciseId, cancellationToken);
 
         if (exercise is null)
         {

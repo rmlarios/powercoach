@@ -12,11 +12,17 @@ public record CheckInDto
     public decimal? Weight { get; init; }
     public string? WeightUnit { get; init; }
     public string? Notes { get; init; }
-    public string? PhotoUrl { get; init; }
+    public List<string> PhotoUrls { get; init; } = [];
     public string? CoachFeedback { get; init; }
     public DateTime? ReviewedAt { get; init; }
     public DateTime CreatedAt { get; init; }
     public DateTime UpdatedAt { get; init; }
+    public int? EnergyLevel { get; init; }
+    public int? SleepQuality { get; init; }
+    public decimal? SleepHours { get; init; }
+    public int? StressLevel { get; init; }
+    public int? NutritionAdherence { get; init; }
+    public int? TrainingAdherence { get; init; }
 }
 
 /// <summary>

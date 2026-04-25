@@ -65,24 +65,25 @@ public class ExerciseConfiguration : IEntityTypeConfiguration<Exercise>
                     ? new List<string>() 
                     : v.Split("|||", StringSplitOptions.RemoveEmptyEntries).ToList());
 
-        // Relationships
+        // Relationships (optional - exercise can exist without a coach)
         builder.HasOne(e => e.Coach)
             .WithMany(c => c.Exercises)
             .HasForeignKey(e => e.CoachId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
 
         // Indexes
         builder.HasIndex(e => e.CoachId)
             .HasDatabaseName("IX_Exercises_CoachId");
 
-        builder.HasIndex(e => new { e.CoachId, e.Name })
+        builder.HasIndex(e => e.Name)
             .IsUnique()
-            .HasDatabaseName("IX_Exercises_CoachId_Name");
+            .HasDatabaseName("IX_Exercises_Name");
 
-        builder.HasIndex(e => new { e.CoachId, e.Category })
-            .HasDatabaseName("IX_Exercises_CoachId_Category");
+        builder.HasIndex(e => e.Category)
+            .HasDatabaseName("IX_Exercises_Category");
 
-        builder.HasIndex(e => new { e.CoachId, e.IsActive })
-            .HasDatabaseName("IX_Exercises_CoachId_IsActive");
+        builder.HasIndex(e => e.IsActive)
+            .HasDatabaseName("IX_Exercises_IsActive");
     }
 }

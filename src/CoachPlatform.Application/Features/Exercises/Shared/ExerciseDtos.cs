@@ -8,7 +8,7 @@ namespace CoachPlatform.Application.Features.Exercises.Shared;
 public record ExerciseDto
 {
     public Guid Id { get; init; }
-    public Guid CoachId { get; init; }
+    public Guid? CoachId { get; init; }
     public string Name { get; init; } = null!;
     public string? Description { get; init; }
     public ExerciseCategory Category { get; init; }

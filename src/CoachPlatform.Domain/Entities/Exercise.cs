@@ -4,16 +4,16 @@ using CoachPlatform.Domain.Enums;
 namespace CoachPlatform.Domain.Entities;
 
 /// <summary>
-/// Exercise entity - represents an exercise in the coach's exercise library.
-/// Aggregate Root - each coach maintains their own exercise catalog.
+/// Exercise entity - represents an exercise in the global exercise library.
+/// Aggregate Root - shared across all coaches.
 /// </summary>
 public class Exercise : AuditableEntity, IAggregateRoot
 {
     /// <summary>
-    /// Reference to the coach who owns this exercise.
-    /// Required for multi-tenant support.
+    /// Optional reference to the coach who created this exercise.
+    /// Null for system-wide exercises.
     /// </summary>
-    public Guid CoachId { get; private set; }
+    public Guid? CoachId { get; private set; }
 
     /// <summary>
     /// Name of the exercise.
@@ -81,13 +81,13 @@ public class Exercise : AuditableEntity, IAggregateRoot
     public int DisplayOrder { get; private set; }
 
     // Navigation property
-    public Coach Coach { get; private set; } = null!;
+    public Coach? Coach { get; private set; }
 
     // EF Core constructor
     private Exercise() { }
 
     private Exercise(
-        Guid coachId,
+        Guid? coachId,
         string name,
         ExerciseCategory category,
         MuscleGroup primaryMuscleGroup,
@@ -108,16 +108,13 @@ public class Exercise : AuditableEntity, IAggregateRoot
     /// Creates a new Exercise.
     /// </summary>
     public static Exercise Create(
-        Guid coachId,
+        Guid? coachId,
         string name,
         ExerciseCategory category,
         MuscleGroup primaryMuscleGroup,
         string? description = null,
         bool isCompound = true)
     {
-        if (coachId == Guid.Empty)
-            throw new ArgumentException("Coach ID is required.", nameof(coachId));
-
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Exercise name is required.", nameof(name));
 

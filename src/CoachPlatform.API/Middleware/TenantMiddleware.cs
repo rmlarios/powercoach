@@ -1,4 +1,5 @@
 using CoachPlatform.Application.Shared.Interfaces;
+using CoachPlatform.Domain.Interfaces;
 
 namespace CoachPlatform.API.Middleware;
 
@@ -18,7 +19,7 @@ public class TenantMiddleware
         _logger = logger;
     }
 
-    public async Task InvokeAsync(HttpContext context, ITenantService tenantService, ICurrentUserService currentUserService)
+    public async Task InvokeAsync(HttpContext context, ITenantService tenantService, ICurrentUserService currentUserService, IAthleteRepository athleteRepository)
     {
         Guid? coachId = null;
 
@@ -26,7 +27,6 @@ public class TenantMiddleware
         if (currentUserService.IsAuthenticated)
         {
             // For coaches, the UserId is the CoachId
-            // For athletes, we would need to look up their coach
             var coachIdClaim = context.User.FindFirst("coach_id")?.Value;
             
             if (!string.IsNullOrEmpty(coachIdClaim) && Guid.TryParse(coachIdClaim, out var parsedCoachId))
@@ -37,6 +37,20 @@ public class TenantMiddleware
             {
                 // If user is a coach, their user ID is their coach ID
                 coachId = currentUserService.UserId;
+            }
+            else if (context.User.IsInRole("Athlete"))
+            {
+                // For athletes, look up their coach from the database
+                var athleteIdClaim = context.User.FindFirst("athlete_id")?.Value;
+                if (!string.IsNullOrEmpty(athleteIdClaim) && Guid.TryParse(athleteIdClaim, out var athleteId))
+                {
+                    var athlete = await athleteRepository.GetByIdAsync(athleteId);
+                    if (athlete != null)
+                    {
+                        coachId = athlete.CoachId;
+                        _logger.LogDebug("Resolved CoachId {CoachId} from Athlete {AthleteId}", coachId, athleteId);
+                    }
+                }
             }
         }
 
