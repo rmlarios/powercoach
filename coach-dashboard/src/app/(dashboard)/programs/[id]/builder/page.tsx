@@ -462,7 +462,7 @@ function ProgramBuilderContent() {
 
       const hasInvalidExerciseIds = payload.weeks.some((week) =>
         week.days.some((day) =>
-          day.exercises.some((ex) => !GUID_REGEX.test(ex.exerciseId))
+          day.exercises.some((ex) => !ex.exerciseId || !GUID_REGEX.test(ex.exerciseId))
         )
       );
 
