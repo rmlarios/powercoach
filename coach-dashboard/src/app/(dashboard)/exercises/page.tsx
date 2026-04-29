@@ -36,9 +36,8 @@ const CATEGORIES: ExerciseCategory[] = [
 ];
 
 const MUSCLE_GROUPS: MuscleGroup[] = [
-  'Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps',
-  'Forearms', 'Quads', 'Hamstrings', 'Glutes', 'Calves',
-  'Core', 'Traps', 'FullBody',
+  'Chest', 'Back', 'Shoulders', 'Legs', 'Quadriceps', 'Hamstrings', 
+  'Glutes', 'Arms', 'Biceps', 'Triceps', 'Core', 'Calves', 'FullBody',
 ];
 
 type FormData = {
@@ -55,7 +54,7 @@ const emptyForm: FormData = {
   name: '',
   description: '',
   category: 'Squat',
-  primaryMuscleGroup: 'Quads',
+  primaryMuscleGroup: 'Quadriceps',
   videoUrl: '',
   equipment: '',
   isCompound: true,
