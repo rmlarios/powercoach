@@ -23,7 +23,7 @@ public class ProgramDayTemplateConfiguration : IEntityTypeConfiguration<ProgramD
             .HasMaxLength(200);
 
         builder.Property(d => d.Focus)
-            .IsRequired()
+            .IsRequired(false)
             .HasConversion<string>()
             .HasMaxLength(50);
 

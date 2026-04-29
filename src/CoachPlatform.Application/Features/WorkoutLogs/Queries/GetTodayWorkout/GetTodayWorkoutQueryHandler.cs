@@ -66,6 +66,7 @@ public class GetTodayWorkoutQueryHandler : IRequestHandler<GetTodayWorkoutQuery,
         // Get the day template for day name and focus
         var dayTemplate = await _context.ProgramDayTemplates
             .AsNoTracking()
+            .Include(d => d.WeekTemplate)
             .Include(d => d.Exercises)
                 .ThenInclude(e => e.Exercise)
             .Where(d => d.WeekTemplate.ProgramTemplateId == activeProgram.ProgramTemplateId
@@ -168,6 +169,7 @@ public class GetTodayWorkoutQueryHandler : IRequestHandler<GetTodayWorkoutQuery,
             DurationMinutes = workout.DurationMinutes,
             FatigueRating = workout.FatigueRating,
             Notes = workout.Notes,
+            WeekNotes = dayTemplate?.WeekTemplate?.Notes,
             Exercises = exerciseGroups
         };
     }

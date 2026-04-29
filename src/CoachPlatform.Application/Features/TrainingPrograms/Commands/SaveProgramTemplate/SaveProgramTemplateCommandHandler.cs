@@ -65,10 +65,13 @@ public class SaveProgramTemplateCommandHandler : IRequestHandler<SaveProgramTemp
             foreach (var dayDto in weekDto.Days)
             {
                 // Parse day focus
-                var focus = DayFocus.FullBody;
+                DayFocus? focus = null;
                 if (!string.IsNullOrWhiteSpace(dayDto.Focus))
                 {
-                    Enum.TryParse<DayFocus>(dayDto.Focus, ignoreCase: true, out focus);
+                    if (Enum.TryParse<DayFocus>(dayDto.Focus, ignoreCase: true, out var parsed))
+                    {
+                        focus = parsed;
+                    }
                 }
 
                 var day = week.AddDay(dayDto.DayNumber, focus, dayDto.Name, dayDto.Notes);

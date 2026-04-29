@@ -95,8 +95,8 @@ public record ProgramDayTemplateDto
     public Guid Id { get; init; }
     public int DayNumber { get; init; }
     public string? Name { get; init; }
-    public DayFocus Focus { get; init; }
-    public string FocusName => Focus.ToString();
+    public DayFocus? Focus { get; init; }
+    public string? FocusName => Focus?.ToString();
     public string? Notes { get; init; }
     public IReadOnlyList<ProgramExerciseTemplateDto> Exercises { get; init; } = [];
 }
@@ -108,7 +108,7 @@ public record AddProgramDayDto
 {
     public int DayNumber { get; init; }
     public string? Name { get; init; }
-    public DayFocus Focus { get; init; }
+    public DayFocus? Focus { get; init; }
     public string? Notes { get; init; }
 }
 
@@ -263,6 +263,16 @@ public record AssignProgramToAthleteDto
     public string? Notes { get; init; }
 }
 
+/// <summary>
+/// DTO for bulk-assigning a program to multiple athletes.
+/// </summary>
+public record BulkAssignProgramDto
+{
+    public List<Guid> AthleteIds { get; init; } = new();
+    public DateTime StartDate { get; init; }
+    public string? Notes { get; init; }
+}
+
 // ========================
 // Athlete Workout DTOs
 // ========================
@@ -275,8 +285,8 @@ public record AthleteWorkoutDto
     public Guid Id { get; init; }
     public int WeekNumber { get; init; }
     public int DayNumber { get; init; }
-    public DayFocus Focus { get; init; }
-    public string FocusName => Focus.ToString();
+    public DayFocus? Focus { get; init; }
+    public string? FocusName => Focus?.ToString();
     public DateTime ScheduledDate { get; init; }
     public DateTime? CompletedDate { get; init; }
     public bool IsCompleted { get; init; }
@@ -375,8 +385,8 @@ public record AthleteWeekScheduleDto
 public record AthleteDayScheduleDto
 {
     public int DayNumber { get; init; }
-    public DayFocus Focus { get; init; }
-    public string FocusName => Focus.ToString();
+    public DayFocus? Focus { get; init; }
+    public string? FocusName => Focus?.ToString();
     public string? Notes { get; init; }
     public DateTime ScheduledDate { get; init; }
     public bool IsCompleted { get; init; }

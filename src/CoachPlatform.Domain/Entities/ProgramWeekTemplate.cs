@@ -76,7 +76,7 @@ public class ProgramWeekTemplate : AuditableEntity
     /// <summary>
     /// Adds a training day to the week.
     /// </summary>
-    public ProgramDayTemplate AddDay(int dayNumber, Enums.DayFocus focus, string? name = null, string? notes = null)
+    public ProgramDayTemplate AddDay(int dayNumber, Enums.DayFocus? focus = null, string? name = null, string? notes = null)
     {
         if (dayNumber < 1 || dayNumber > 7)
             throw new ArgumentException("Day number must be between 1 and 7.", nameof(dayNumber));

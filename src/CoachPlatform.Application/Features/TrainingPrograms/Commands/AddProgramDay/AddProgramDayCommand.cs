@@ -13,6 +13,6 @@ public record AddProgramDayCommand : IRequest<Guid>, ITenantRequest
     public Guid WeekTemplateId { get; init; }
     public int DayNumber { get; init; }
     public string? Name { get; init; }
-    public DayFocus Focus { get; init; }
+    public DayFocus? Focus { get; init; }
     public string? Notes { get; init; }
 }

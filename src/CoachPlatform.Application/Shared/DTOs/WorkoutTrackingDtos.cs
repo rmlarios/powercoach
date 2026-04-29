@@ -118,6 +118,8 @@ public record TodayWorkoutDto
     public int? DurationMinutes { get; init; }
     public int? FatigueRating { get; init; }
     public string? Notes { get; init; }
+    /// <summary>Coach notes for the week, visible to the athlete.</summary>
+    public string? WeekNotes { get; init; }
     public IReadOnlyList<WorkoutExerciseGroupDto> Exercises { get; init; } = [];
 }
 

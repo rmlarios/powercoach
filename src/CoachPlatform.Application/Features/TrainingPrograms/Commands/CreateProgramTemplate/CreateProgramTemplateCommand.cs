@@ -12,4 +12,5 @@ public record CreateProgramTemplateCommand : IRequest<Guid>, ITenantRequest
     public string Name { get; init; } = null!;
     public string? Description { get; init; }
     public int DurationWeeks { get; init; }
+    public int? DaysPerWeek { get; init; }
 }

@@ -26,7 +26,7 @@ public class ProgramDayTemplate : AuditableEntity
     /// <summary>
     /// Primary focus of the training day.
     /// </summary>
-    public DayFocus Focus { get; private set; }
+    public DayFocus? Focus { get; private set; }
 
     /// <summary>
     /// Optional notes or instructions for the day.
@@ -44,7 +44,7 @@ public class ProgramDayTemplate : AuditableEntity
     private ProgramDayTemplate(
         Guid weekTemplateId,
         int dayNumber,
-        DayFocus focus,
+        DayFocus? focus,
         string? name,
         string? notes)
     {
@@ -61,7 +61,7 @@ public class ProgramDayTemplate : AuditableEntity
     internal static ProgramDayTemplate Create(
         Guid weekTemplateId,
         int dayNumber,
-        DayFocus focus,
+        DayFocus? focus = null,
         string? name = null,
         string? notes = null)
     {
@@ -77,7 +77,7 @@ public class ProgramDayTemplate : AuditableEntity
     /// <summary>
     /// Updates the day template.
     /// </summary>
-    public void Update(DayFocus focus, string? name, string? notes)
+    public void Update(DayFocus? focus, string? name, string? notes)
     {
         Focus = focus;
         Name = name?.Trim();

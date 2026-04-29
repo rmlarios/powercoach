@@ -23,5 +23,11 @@ public class CreateProgramTemplateCommandValidator : AbstractValidator<CreatePro
         RuleFor(x => x.DurationWeeks)
             .GreaterThanOrEqualTo(1).WithMessage("Duration must be at least 1 week.")
             .LessThanOrEqualTo(52).WithMessage("Duration must not exceed 52 weeks.");
+
+        When(x => x.DaysPerWeek.HasValue, () =>
+        {
+            RuleFor(x => x.DaysPerWeek!.Value)
+                .InclusiveBetween(1, 7).WithMessage("Days per week must be between 1 and 7.");
+        });
     }
 }

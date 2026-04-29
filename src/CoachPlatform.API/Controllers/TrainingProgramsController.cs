@@ -2,6 +2,7 @@ using CoachPlatform.Application.Features.TrainingPrograms.Commands.AddProgramDay
 using CoachPlatform.Application.Features.TrainingPrograms.Commands.AddProgramExercise;
 using CoachPlatform.Application.Features.TrainingPrograms.Commands.AddProgramWeek;
 using CoachPlatform.Application.Features.TrainingPrograms.Commands.AssignProgramToAthlete;
+using CoachPlatform.Application.Features.TrainingPrograms.Commands.BulkAssignProgramToAthletes;
 using CoachPlatform.Application.Features.TrainingPrograms.Commands.CreateProgramTemplate;
 using CoachPlatform.Application.Features.TrainingPrograms.Commands.DeleteProgramDay;
 using CoachPlatform.Application.Features.TrainingPrograms.Commands.DeleteProgramExercise;
@@ -426,6 +427,41 @@ public class TrainingProgramsController : ControllerBase
             nameof(GetAthleteProgram),
             new { athleteId },
             athleteProgramId);
+    }
+
+    /// <summary>
+    /// Assign a program template to multiple athletes at once.
+    /// Athletes that already have an active program are silently skipped.
+    /// </summary>
+    /// <param name="programId">The program template's unique identifier.</param>
+    /// <param name="dto">The bulk assignment data.</param>
+    /// <param name="coachId">The coach's unique identifier.</param>
+    /// <returns>List of created AthleteProgram IDs.</returns>
+    [HttpPost("programs/{programId:guid}/bulk-assign")]
+    [ProducesResponseType(typeof(List<Guid>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<List<Guid>>> BulkAssignProgram(
+        Guid programId,
+        [FromBody] BulkAssignProgramDto dto,
+        [FromQuery] Guid coachId)
+    {
+        var command = new BulkAssignProgramToAthletesCommand
+        {
+            CoachId = coachId,
+            ProgramTemplateId = programId,
+            AthleteIds = dto.AthleteIds,
+            StartDate = dto.StartDate,
+            Notes = dto.Notes,
+        };
+
+        var createdIds = await _mediator.Send(command);
+
+        _logger.LogInformation(
+            "Bulk assigned program {ProgramId} to {Count} athletes",
+            programId, createdIds.Count);
+
+        return Ok(createdIds);
     }
 
     /// <summary>

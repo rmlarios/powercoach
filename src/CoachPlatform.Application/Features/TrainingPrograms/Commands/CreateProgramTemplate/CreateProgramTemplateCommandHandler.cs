@@ -46,6 +46,23 @@ public class CreateProgramTemplateCommandHandler : IRequestHandler<CreateProgram
             durationWeeks: request.DurationWeeks);
 
         _context.ProgramTemplates.Add(programTemplate);
+
+        // Auto-generate weeks and optional days
+        for (var w = 1; w <= request.DurationWeeks; w++)
+        {
+            var week = programTemplate.AddWeek(w, $"Semana {w}");
+            _context.ProgramWeekTemplates.Add(week);
+
+            if (request.DaysPerWeek.HasValue)
+            {
+                for (var d = 1; d <= request.DaysPerWeek.Value; d++)
+                {
+                    var day = week.AddDay(d, focus: null, name: $"Día {d}");
+                    _context.ProgramDayTemplates.Add(day);
+                }
+            }
+        }
+
         await _context.SaveChangesAsync(cancellationToken);
 
         return programTemplate.Id;
