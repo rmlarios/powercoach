@@ -113,6 +113,7 @@ secrets.json
 .env
 .env.*
 !.env.example
+!.env.production
 
 # Misc
 *.tmp
