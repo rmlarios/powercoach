@@ -74,6 +74,9 @@ import {
 import { mockProgram, mockExerciseOptions, mockAthletes } from '@/lib/mock-data';
 import { ExerciseOption, BuilderWeek, BuilderDay, BuilderExercise, BuilderViewMode } from '@/types/builder';
 import { formatDate } from '@/utils/format-date';
+import { toast } from 'sonner';
+
+const GUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 // Mock data is used only as a fallback when API calls fail or return no data
 
@@ -391,7 +394,10 @@ function ProgramBuilderContent() {
 
   // Convert exercises to options format — uses real API data, falls back to mock on error
   const exerciseOptions: ExerciseOption[] = useMemo(() => {
-    if (isExercisesError || !exercisesData) return mockExerciseOptions;
+    if (isExercisesError || !exercisesData) {
+      // In production we must avoid mock IDs because backend requires GUID exercise IDs.
+      return process.env.NODE_ENV === 'development' ? mockExerciseOptions : [];
+    }
     return exercisesData.map((ex) => ({
       id: ex.id,
       name: ex.name,
@@ -454,14 +460,27 @@ function ProgramBuilderContent() {
         })),
       };
 
+      const hasInvalidExerciseIds = payload.weeks.some((week) =>
+        week.days.some((day) =>
+          day.exercises.some((ex) => !GUID_REGEX.test(ex.exerciseId))
+        )
+      );
+
+      if (hasInvalidExerciseIds) {
+        throw new Error('Hay ejercicios sin seleccionar desde la libreria. Elimina filas en blanco y agrega ejercicios validos.');
+      }
+
       return programsApi.saveFull(programId, payload, coachId);
     },
     onSuccess: () => {
       dispatch({ type: 'MARK_SAVED' });
       queryClient.invalidateQueries({ queryKey: ['program', programId] });
+      toast.success('Programa guardado correctamente.');
     },
-    onError: () => {
+    onError: (error: unknown) => {
       dispatch({ type: 'SET_SAVING', payload: false });
+      const message = error instanceof Error ? error.message : 'No se pudo guardar el programa.';
+      toast.error(message);
     },
   });
 
