@@ -82,7 +82,7 @@ public class ExceptionHandlingMiddleware
                 new ErrorResponse
                 {
                     Type = "InternalServerError",
-                    Title = "An unexpected error occurred.",
+                    Title = "An unexpected error occurred: " + exception.Message + "\n" + exception.StackTrace,
                     Status = (int)HttpStatusCode.InternalServerError
                 })
         };

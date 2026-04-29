@@ -45,6 +45,9 @@ public class SaveProgramTemplateCommandHandler : IRequestHandler<SaveProgramTemp
         }
         _context.ProgramWeekTemplates.RemoveRange(program.Weeks);
 
+        // Clear the in-memory collection so AddWeek doesn't crash detecting existing WeekNumbers
+        program.ClearWeeks();
+
         // Update program metadata
         program.Update(
             request.Data.Name,
