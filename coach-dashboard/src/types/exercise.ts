@@ -6,9 +6,8 @@ export type ExerciseCategory =
   | 'Mobility' | 'Core';
 
 export type MuscleGroup =
-  | 'Chest' | 'Back' | 'Shoulders' | 'Biceps' | 'Triceps'
-  | 'Forearms' | 'Quads' | 'Hamstrings' | 'Glutes' | 'Calves'
-  | 'Core' | 'Traps' | 'FullBody';
+  | 'Chest' | 'Back' | 'Shoulders' | 'Legs' | 'Quadriceps' | 'Hamstrings' 
+  | 'Glutes' | 'Arms' | 'Biceps' | 'Triceps' | 'Core' | 'Calves' | 'FullBody';
 
 /** Full exercise detail (matches backend ExerciseDto) */
 export interface Exercise {
