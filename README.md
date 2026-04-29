@@ -1,4 +1,4 @@
-# CoachPlatform
+# CoachPlatform.
 
 Plataforma web de gestión para coaches de powerlifting/fitness. Permite administrar atletas, programas de entrenamiento, suscripciones, pagos y seguimiento de entrenamientos en tiempo real.
 
