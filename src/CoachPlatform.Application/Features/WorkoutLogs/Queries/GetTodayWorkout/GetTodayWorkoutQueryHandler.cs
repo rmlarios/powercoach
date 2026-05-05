@@ -24,7 +24,8 @@ public class GetTodayWorkoutQueryHandler : IRequestHandler<GetTodayWorkoutQuery,
 
     public async Task<TodayWorkoutDto?> Handle(GetTodayWorkoutQuery request, CancellationToken cancellationToken)
     {
-        var today = DateTime.UtcNow.Date;
+        var now = DateTime.UtcNow;
+        var today = now.Date;
 
         // Find the athlete's active or ready-to-start program
         var activeProgram = await _context.AthletePrograms
@@ -32,7 +33,7 @@ public class GetTodayWorkoutQueryHandler : IRequestHandler<GetTodayWorkoutQuery,
             .Where(ap => ap.AthleteId == request.AthleteId
                          && (ap.Status == Domain.Enums.ProgramStatus.Active
                              || (ap.Status == Domain.Enums.ProgramStatus.NotStarted
-                                 && ap.StartDate.Date <= today)))
+                                 && ap.StartDate <= now)))
             .FirstOrDefaultAsync(cancellationToken);
 
         if (activeProgram is null)
@@ -62,7 +63,7 @@ public class GetTodayWorkoutQueryHandler : IRequestHandler<GetTodayWorkoutQuery,
                 .Include(w => w.ExerciseLogs)
                     .ThenInclude(l => l.Exercise)
                 .Where(w => w.AthleteProgramId == activeProgram.Id
-                            && w.ScheduledDate.Date > today
+                            && w.ScheduledDate.Date >= today
                             && !w.IsCompleted)
                 .OrderBy(w => w.ScheduledDate)
                 .FirstOrDefaultAsync(cancellationToken);
