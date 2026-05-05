@@ -27,7 +27,9 @@ public class GetWeekWorkoutsQueryHandler : IRequestHandler<GetWeekWorkoutsQuery,
             .AsNoTracking()
             .Include(ap => ap.ProgramTemplate)
             .Where(ap => ap.AthleteId == request.AthleteId
-                         && ap.Status == ProgramStatus.Active)
+                         && (ap.Status == ProgramStatus.Active
+                             || (ap.Status == ProgramStatus.NotStarted
+                                 && ap.StartDate.Date <= DateTime.UtcNow.Date)))
             .FirstOrDefaultAsync(cancellationToken);
 
         if (activeProgram is null)
