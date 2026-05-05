@@ -26,16 +26,24 @@ public class GetTodayWorkoutQueryHandler : IRequestHandler<GetTodayWorkoutQuery,
     {
         var today = DateTime.UtcNow.Date;
 
-        // Find the athlete's active program
+        // Find the athlete's active or ready-to-start program
         var activeProgram = await _context.AthletePrograms
-            .AsNoTracking()
             .Include(ap => ap.ProgramTemplate)
             .Where(ap => ap.AthleteId == request.AthleteId
-                         && ap.Status == Domain.Enums.ProgramStatus.Active)
+                         && (ap.Status == Domain.Enums.ProgramStatus.Active
+                             || (ap.Status == Domain.Enums.ProgramStatus.NotStarted
+                                 && ap.StartDate.Date <= today)))
             .FirstOrDefaultAsync(cancellationToken);
 
         if (activeProgram is null)
             return null;
+
+        // Auto-activate if still NotStarted and start date has arrived
+        if (activeProgram.Status == Domain.Enums.ProgramStatus.NotStarted)
+        {
+            activeProgram.Start();
+            await _context.SaveChangesAsync(cancellationToken);
+        }
 
         // Find today's workout (or the nearest future one not completed)
         var workout = await _context.AthleteWorkouts
