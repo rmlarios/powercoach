@@ -22,6 +22,8 @@ public class GetWeekWorkoutsQueryHandler : IRequestHandler<GetWeekWorkoutsQuery,
 
     public async Task<WeekWorkoutsDto?> Handle(GetWeekWorkoutsQuery request, CancellationToken cancellationToken)
     {
+        var now = DateTime.UtcNow;
+
         // Find the athlete's active program
         var activeProgram = await _context.AthletePrograms
             .AsNoTracking()
@@ -29,7 +31,7 @@ public class GetWeekWorkoutsQueryHandler : IRequestHandler<GetWeekWorkoutsQuery,
             .Where(ap => ap.AthleteId == request.AthleteId
                          && (ap.Status == ProgramStatus.Active
                              || (ap.Status == ProgramStatus.NotStarted
-                                 && ap.StartDate.Date <= DateTime.UtcNow.Date)))
+                                 && ap.StartDate <= now)))
             .FirstOrDefaultAsync(cancellationToken);
 
         if (activeProgram is null)
